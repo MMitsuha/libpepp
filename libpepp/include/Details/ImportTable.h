@@ -1,27 +1,37 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <functional>
 #include <windows.h>
 
 #include "../libpepp.h"
 
 namespace libpepp {
 	namespace Details {
-		class ExportTable
+		class ImportTable
 		{
 		public:
+			using ImpFunc = struct _IMP_FUNC {
+				size_t Ordinal = 0;
+				struct
+				{
+					WORD Hint = 0;
+					std::string Name;
+				} ByName;
+			};
+
 			using Entry = struct _ENTRY {
-				uint32_t Ordinal = 0;
-				std::string Name;
-				uint32_t Rva = 0;
+				std::string DllName;
+				DWORD TimeDateStamp = 0;
+				DWORD ForwarderChain = 0;
+				std::vector<ImpFunc> Iat;
+				std::vector<ImpFunc> Ilt;
 			};
 
 			explicit
-				ExportTable() = delete;
+				ImportTable() = default;
 
 			explicit
-				ExportTable(
+				ImportTable(
 					Pe& pe
 				);
 

@@ -75,14 +75,6 @@ namespace libpepp {
 		}
 	}
 
-	bool
-		Pe::isValid(
-			void
-		) const
-	{
-		return m_valid;
-	}
-
 	DosHeader&
 		Pe::getDosHeader(
 			void
@@ -120,7 +112,7 @@ namespace libpepp {
 			size_t va
 		)
 	{
-		auto rva = vaToRva(va);
+		auto rva = va - getNtHeaders().getOptionalHeader().ImageBase;
 
 		return getSectionByRva(rva);
 	}
@@ -170,86 +162,6 @@ namespace libpepp {
 	//	Pe read: enumerate data dictionary
 	//
 
-	Pe::Imports
-		Pe::enumImport(
-			void
-		)
-	{
-		// TODO: Support forwarder chain
-
-		Imports ret;
-		auto importDir = getNtHeaders().getOptionalHeader().DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
-		auto rva = importDir.VirtualAddress;
-		auto size = importDir.Size;
-
-		if (rva == 0) {
-			return {};
-		}
-
-		auto base = m_buffer.data();
-		auto pImport = reinterpret_cast<PIMAGE_IMPORT_DESCRIPTOR>(base + rvaToFo(rva));
-
-		while (pImport->Name) {
-			ImportEntry entry;
-			std::string name = reinterpret_cast<char*>(base + rvaToFo(pImport->Name));
-			spdlog::debug("In {}:", name);
-			entry.DllName = std::move(name);
-			entry.TimeDateStamp = pImport->TimeDateStamp;
-			entry.ForwarderChain = pImport->ForwarderChain;
-
-			if (pImport->OriginalFirstThunk) {
-				spdlog::debug("\tImport lookup table:");
-				auto pIlt = reinterpret_cast<PIMAGE_THUNK_DATA>(base + rvaToFo(pImport->OriginalFirstThunk));
-				while (pIlt->u1.Function) {
-					Import data{};
-					if (FlagOn(pIlt->u1.Function, IMAGE_ORDINAL_FLAG)) {
-						// Imported by ordinal
-						spdlog::debug("\t\tImported by ordinal: 0x{:x}.", ClearFlag(pIlt->u1.Ordinal, IMAGE_ORDINAL_FLAG));
-					}
-					else {
-						// Imported by name
-						auto func = reinterpret_cast<PIMAGE_IMPORT_BY_NAME>(base + rvaToFo(pIlt->u1.Function));
-						spdlog::debug("\t\tImported by name: {} and hint: {}.", func->Name, func->Hint);
-						data.ByName.Hint = func->Hint;
-						data.ByName.Name = func->Name;
-					}
-
-					data.Ordinal = pIlt->u1.Function;
-					entry.Ilt.emplace_back(std::move(data));
-					pIlt++;
-				}
-			}
-			else if (pImport->FirstThunk) {
-				spdlog::debug("\tImport address table:");
-				auto pIat = reinterpret_cast<PIMAGE_THUNK_DATA>(base + rvaToFo(pImport->FirstThunk));
-				while (pIat->u1.Function) {
-					Import data{};
-					if (pIat->u1.Function & IMAGE_ORDINAL_FLAG) {
-						// Imported by ordinal
-						spdlog::debug("\t\tImported by ordinal: 0x{:x}.", ClearFlag(pIat->u1.Ordinal, IMAGE_ORDINAL_FLAG));
-					}
-					else {
-						// Imported by name
-						auto func = reinterpret_cast<PIMAGE_IMPORT_BY_NAME>(base + rvaToFo(pIat->u1.Function));
-						spdlog::debug("\t\tImported by name: {} and hint: {}.", func->Name, func->Hint);
-						data.ByName.Hint = func->Hint;
-						data.ByName.Name = func->Name;
-					}
-
-					data.Ordinal = pIat->u1.Function;
-					entry.Iat.emplace_back(std::move(data));
-					pIat++;
-				}
-			}
-			else spdlog::warn("No import was found in the file.");
-
-			ret.emplace_back(std::move(entry));
-			pImport++;
-		}
-
-		return ret;
-	}
-
 	void
 		Pe::enumResource(
 			void
@@ -272,43 +184,6 @@ namespace libpepp {
 		)
 	{
 		// TODO: Not implemented
-	}
-
-	Pe::Relocs
-		Pe::enumBasereloc(
-			void
-		)
-	{
-		Relocs ret;
-		auto relocsDir = getNtHeaders().getOptionalHeader().DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
-		auto rva = relocsDir.VirtualAddress;
-		auto size = relocsDir.Size;
-
-		if (rva == 0) {
-			return {};
-		}
-
-		auto base = m_buffer.data();
-		auto endOfRelocs = reinterpret_cast<uint8_t*>(base + rvaToFo(rva) + size);
-		auto pRelocsBlock = reinterpret_cast<PIMAGE_BASE_RELOCATION>(base + rvaToFo(rva));
-		auto i = 0;
-		while (reinterpret_cast<uint8_t*>(pRelocsBlock) < endOfRelocs) {
-			auto numRelocsInBlock = (pRelocsBlock->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(uint16_t);
-			auto reloc = reinterpret_cast<uint16_t*>(pRelocsBlock + 1);
-			for (uint32_t i = 0; i < numRelocsInBlock; i++) {
-				auto type = reloc[i] >> 12;
-				auto offset = reloc[i] & 0x0FFF;
-				auto rvaReloc = pRelocsBlock->VirtualAddress + offset;
-				ret.emplace_back(type, rvaReloc);
-
-				spdlog::debug("{}: Relocation type: {}, rva: 0x{:x}", i, type, rvaReloc);
-			}
-
-			pRelocsBlock = reinterpret_cast<PIMAGE_BASE_RELOCATION>(reinterpret_cast<uint8_t*>(pRelocsBlock) + pRelocsBlock->SizeOfBlock);
-			i++;
-		}
-
-		return ret;
 	}
 
 	void
@@ -395,6 +270,7 @@ namespace libpepp {
 	//	Pe write
 	//
 
+		/*
 	void
 		Pe::setImport(
 			Imports& imports
@@ -402,7 +278,6 @@ namespace libpepp {
 	{
 		// TODO: Not implemented
 
-		/*
 		// TODO: Support forwarder chain
 
 		// Get information
@@ -517,8 +392,8 @@ namespace libpepp {
 
 			pDescriptorStart++;
 		}
+}
 		*/
-	}
 
 	size_t
 		Pe::updateHeaders(
@@ -666,72 +541,8 @@ namespace libpepp {
 	}
 
 	//
-	//	Offset Translate
+	//	Validation
 	//
-
-	size_t
-		Pe::vaToRva(
-			size_t va
-		)
-	{
-		auto vaEntry = getNtHeaders().getOptionalHeader().AddressOfEntryPoint;
-
-		if (va < vaEntry) {
-			spdlog::error("Va: 0x{:x} is not in process's memory range.", va);
-		}
-
-		return va - vaEntry;
-	}
-
-	size_t
-		Pe::rvaToVa(
-			size_t rva
-		)
-	{
-		auto vaEntry = getNtHeaders().getOptionalHeader().AddressOfEntryPoint;
-
-		return rva + vaEntry;
-	}
-
-	size_t
-		Pe::foToRva(
-			size_t fo
-		)
-	{
-		auto& sec = getSectionByFo(fo);
-
-		return fo - sec.PointerToRawData + sec.VirtualAddress;
-	}
-
-	size_t
-		Pe::rvaToFo(
-			size_t rva
-		)
-	{
-		auto& sec = getSectionByRva(rva);
-
-		return rva - sec.VirtualAddress + sec.PointerToRawData;
-	}
-
-	size_t
-		Pe::foToVa(
-			size_t fo
-		)
-	{
-		auto& sec = getSectionByFo(fo);
-
-		return rvaToVa(fo - sec.PointerToRawData + sec.VirtualAddress);
-	}
-
-	size_t
-		Pe::vaToFo(
-			size_t va
-		)
-	{
-		auto& sec = getSectionByVa(va);
-
-		return vaToRva(va) - sec.VirtualAddress + sec.PointerToRawData;
-	}
 
 	bool
 		Pe::validVa(
@@ -748,7 +559,7 @@ namespace libpepp {
 			size_t rva
 		)
 	{
-		if (vaToRva(rva) > getNtHeaders().getOptionalHeader().SizeOfImage) return false;
+		if (rva + getNtHeaders().getOptionalHeader().ImageBase > getNtHeaders().getOptionalHeader().SizeOfImage) return false;
 
 		return true;
 	}
@@ -763,6 +574,18 @@ namespace libpepp {
 		return true;
 	}
 
+	bool
+		Pe::isValid(
+			void
+		) const
+	{
+		return m_valid;
+	}
+
+	//
+	//	Other stuffs
+	//
+
 	uint32_t
 		Pe::computeChecksum(
 			void
@@ -776,7 +599,7 @@ namespace libpepp {
 		{
 			uint32_t dw = *reinterpret_cast<uint32_t*>(base + i);
 
-			//Skip "CheckSum" pos
+			//Skip "CheckSum" position
 			if (i == posChecksum) continue;
 
 			// Calculate checksum

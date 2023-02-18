@@ -1,27 +1,22 @@
 #pragma once
-#include <vector>
-#include <string>
-#include <functional>
-#include <windows.h>
 
 #include "../libpepp.h"
 
 namespace libpepp {
 	namespace Details {
-		class ExportTable
+		class BaseRelocTable
 		{
 		public:
 			using Entry = struct _ENTRY {
-				uint32_t Ordinal = 0;
-				std::string Name;
+				uint8_t Type = 0;
 				uint32_t Rva = 0;
 			};
 
 			explicit
-				ExportTable() = delete;
+				BaseRelocTable() = default;
 
 			explicit
-				ExportTable(
+				BaseRelocTable(
 					Pe& pe
 				);
 
@@ -31,7 +26,7 @@ namespace libpepp {
 				);
 
 		private:
-			std::vector<Entry> m_Table{};
+			std::vector<Entry> m_Table;
 		};
 	}
 }

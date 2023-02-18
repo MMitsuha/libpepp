@@ -167,7 +167,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\BaseObject.cpp" />
+    <ClCompile Include="source\Details\Address.cpp" />
+    <ClCompile Include="source\Details\BaseRelocTable.cpp" />
     <ClCompile Include="source\Details\ExportTable.cpp" />
+    <ClCompile Include="source\Details\ImportTable.cpp" />
     <ClCompile Include="source\DosHeader.cpp" />
     <ClCompile Include="source\FileHeader.cpp" />
     <ClCompile Include="source\NtHeaders.cpp" />
@@ -177,7 +180,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\BaseObject.h" />
+    <ClInclude Include="include\Details\Address.h" />
+    <ClInclude Include="include\Details\BaseRelocTable.h" />
     <ClInclude Include="include\Details\ExportTable.h" />
+    <ClInclude Include="include\Details\ImportTable.h" />
     <ClInclude Include="include\DosHeader.h" />
     <ClInclude Include="include\FileHeader.h" />
     <ClInclude Include="include\NtHeaders.h" />

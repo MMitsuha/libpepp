@@ -55,11 +55,6 @@ namespace libpepp {
 				const Buffer& buffer
 			);
 
-		bool
-			isValid(
-				void
-			) const;
-
 		DosHeader&
 			getDosHeader(
 				void
@@ -106,35 +101,21 @@ namespace libpepp {
 
 		template<typename T>
 		T
-			enumDataDictionaries(
+			getDetailed(
 				void
 			)
 		{
 			return T(*this);
 		}
 
-		using Import = struct _IMPORT {
-			size_t Ordinal = 0;
-			struct
-			{
-				WORD Hint = 0;
-				std::string Name;
-			} ByName;
-		};
-
-		using ImportEntry = struct _IMPORT_ENTRY {
-			std::string DllName;
-			DWORD TimeDateStamp = 0;
-			DWORD ForwarderChain = 0;
-			std::vector<Import> Iat;
-			std::vector<Import> Ilt;
-		};
-
-		using Imports = std::vector<ImportEntry>;
-		Imports
-			enumImport(
+		template<typename T>
+		T
+			enumDataDictionaries(
 				void
-			);
+			)
+		{
+			return T(*this);
+		}
 
 		void
 			enumResource(
@@ -148,17 +129,6 @@ namespace libpepp {
 
 		void
 			enumSecurity(
-				void
-			);
-
-		using Reloc = struct _RELOC {
-			uint8_t Type = 0;
-			uint32_t Rva = 0;
-		};
-
-		using Relocs = std::vector<Reloc>;
-		Relocs
-			enumBasereloc(
 				void
 			);
 
@@ -216,10 +186,12 @@ namespace libpepp {
 		//	Pe write
 		//
 
+		/*
 		void
 			setImport(
 				Imports& imports
 			);
+		*/
 
 		size_t
 			updateHeaders(
@@ -242,38 +214,8 @@ namespace libpepp {
 			);
 
 		//
-		//	Offset Translate
+		//	Validation
 		//
-
-		size_t
-			vaToRva(
-				size_t va
-			);
-
-		size_t
-			rvaToVa(
-				size_t rva
-			);
-
-		size_t
-			foToRva(
-				size_t fo
-			);
-
-		size_t
-			rvaToFo(
-				size_t rva
-			);
-
-		size_t
-			foToVa(
-				size_t fo
-			);
-
-		size_t
-			vaToFo(
-				size_t va
-			);
 
 		bool
 			validVa(
@@ -289,6 +231,11 @@ namespace libpepp {
 			validFo(
 				size_t fo
 			);
+
+		bool
+			isValid(
+				void
+			) const;
 
 		//
 		//	Other stuffs

@@ -45,6 +45,15 @@
     <ClCompile Include="source\Details\ExportTable.cpp">
       <Filter>源文件\Details</Filter>
     </ClCompile>
+    <ClCompile Include="source\Details\Address.cpp">
+      <Filter>源文件\Details</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Details\ImportTable.cpp">
+      <Filter>源文件\Details</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Details\BaseRelocTable.cpp">
+      <Filter>源文件\Details</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Details\ExportTable.h">
@@ -70,6 +79,15 @@
     </ClInclude>
     <ClInclude Include="include\SectionHeader.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Details\Address.h">
+      <Filter>头文件\Details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Details\ImportTable.h">
+      <Filter>头文件\Details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Details\BaseRelocTable.h">
+      <Filter>头文件\Details</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

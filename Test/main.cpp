@@ -2,6 +2,8 @@
 
 #include "libpepp.h"
 #include "Details/ExportTable.h"
+#include "Details/ImportTable.h"
+#include "Details/BaseRelocTable.h"
 
 int
 main(
@@ -14,6 +16,8 @@ main(
 	libpepp::Pe objTarget(pathTarget);
 
 	auto exports = objTarget.enumDataDictionaries<libpepp::Details::ExportTable>();
+	auto imports = objTarget.enumDataDictionaries<libpepp::Details::ImportTable>();
+	auto baserelocs = objTarget.enumDataDictionaries<libpepp::Details::BaseRelocTable>();
 
 	return 0;
 }
