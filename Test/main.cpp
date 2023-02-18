@@ -1,6 +1,5 @@
-#include <iostream>
-#include <string>
-#include <spdlog\spdlog.h>
+#include "stdafx.h"
+
 #include "libpepp.h"
 #include "Details/ExportTable.h"
 
@@ -14,7 +13,7 @@ main(
 	std::string pathTarget = R"(C:\Windows\system32\kernel32.dll)";
 	libpepp::Pe objTarget(pathTarget);
 
-	auto exports = libpepp::Details::ExportTable(objTarget);
+	auto exports = objTarget.enumDataDictionaries<libpepp::Details::ExportTable>();
 
 	return 0;
 }

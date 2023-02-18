@@ -9,8 +9,16 @@ namespace libpepp {
 		const std::filesystem::path& path
 	)
 	{
-		spdlog::debug("Pe constructed.");
+		spdlog::trace("Pe constructed.");
 		open(path);
+	}
+
+	Pe::Pe(
+		const Buffer& buffer
+	)
+	{
+		spdlog::trace("Pe constructed.");
+		open(buffer);
 	}
 
 	bool
@@ -18,7 +26,7 @@ namespace libpepp {
 			const std::filesystem::path& path
 		)
 	{
-		spdlog::debug("Building pe with given path.");
+		spdlog::trace("Building pe with given path.");
 		// Initialize base object
 		auto& rBaseObject = asBaseObject();
 		auto ret = rBaseObject.open(path);
@@ -33,7 +41,7 @@ namespace libpepp {
 			const Buffer& buffer
 		)
 	{
-		spdlog::debug("Building pe with given buffer.");
+		spdlog::trace("Building pe with given buffer.");
 		// Initialize base object
 		auto& rBaseObject = asBaseObject();
 		rBaseObject.open(buffer);

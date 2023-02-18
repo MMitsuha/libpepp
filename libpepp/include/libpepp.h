@@ -40,6 +40,11 @@ namespace libpepp {
 				const std::filesystem::path& path
 			);
 
+		explicit
+			Pe(
+				const Buffer& buffer
+			);
+
 		bool
 			open(
 				const std::filesystem::path& buffer

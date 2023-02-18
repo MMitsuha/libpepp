@@ -7,6 +7,7 @@ namespace libpepp {
 			Pe& pe
 		)
 		{
+			spdlog::trace("Export table constructed.");
 			auto importDir = pe.getNtHeaders().getOptionalHeader().DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
 			auto rva = importDir.VirtualAddress;
 			auto size = importDir.Size;
@@ -29,6 +30,16 @@ namespace libpepp {
 				m_Table.emplace_back(funcOrd, funcName, funcRvaAddr);
 
 				spdlog::debug("Ordinal: {}, name: {}, rva: 0x{:x}.", funcOrd, funcName, funcRvaAddr);
+			}
+		}
+
+		void
+			ExportTable::enumAll(
+				std::function<bool(Entry&)> func
+			)
+		{
+			for (auto& entry : m_Table) {
+				func(entry);
 			}
 		}
 	}

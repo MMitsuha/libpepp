@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <function>
 #include <windows.h>
 
 #include "../libpepp.h"
@@ -22,6 +23,11 @@ namespace libpepp {
 			explicit
 				ExportTable(
 					Pe& file
+				);
+
+			void
+				enumAll(
+					std::function<bool(Entry&)> func
 				);
 
 		private:
