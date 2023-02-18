@@ -5,7 +5,7 @@ namespace libpepp {
 		uint32_t offset
 	)
 	{
-		spdlog::debug("Nt headers constructed with offset: {}.", offset);
+		spdlog::trace("Nt headers constructed with offset: {}.", offset);
 		open(offset);
 	}
 
@@ -14,7 +14,7 @@ namespace libpepp {
 			uint32_t offset
 		)
 	{
-		spdlog::debug("Building nt headers with base object and offset: {}.", offset);
+		spdlog::trace("Building nt headers with base object and offset: {}.", offset);
 		open(m_buffer, offset);
 	}
 
@@ -29,7 +29,7 @@ namespace libpepp {
 			return;
 		}
 
-		spdlog::debug("Building nt headers with given buffer and offset: {}.", offset);
+		spdlog::trace("Building nt headers with given buffer and offset: {}.", offset);
 		const auto pNtHeaders = reinterpret_cast<IMAGE_NT_HEADERS const*>(buffer.data() + offset);
 
 		// Check nt headers
@@ -83,6 +83,7 @@ namespace libpepp {
 			uint32_t offset
 		)
 	{
+		spdlog::trace("Copied nt headers to buffer with allocate");
 		auto& rFileHeader = getFileHeader();
 		auto& rOptionalHeader = getOptionalHeader();
 
@@ -109,6 +110,7 @@ namespace libpepp {
 			uint32_t offset
 		)
 	{
+		spdlog::trace("Copied nt headers to buffer without allocate");
 		auto& rFileHeader = getFileHeader();
 		auto& rOptionalHeader = getOptionalHeader();
 

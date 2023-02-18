@@ -6,8 +6,16 @@ namespace libpepp {
 		const std::filesystem::path& path
 	)
 	{
-		spdlog::debug("Base object constructed.");
+		spdlog::trace("Base object constructed.");
 		open(path);
+	}
+
+	BaseObject::BaseObject(
+		const Buffer& buffer
+	)
+	{
+		spdlog::trace("Base object constructed.");
+		open(buffer);
 	}
 
 	bool
@@ -15,7 +23,7 @@ namespace libpepp {
 			const std::filesystem::path& path
 		)
 	{
-		spdlog::debug("Building base object with given path.");
+		spdlog::trace("Building base object with given path.");
 		m_buffer.clear();
 		std::ifstream file(path, std::ios_base::binary);
 
@@ -34,7 +42,7 @@ namespace libpepp {
 			const Buffer& buffer
 		)
 	{
-		spdlog::debug("Building base object with given buffer.");
+		spdlog::trace("Building base object with given buffer.");
 		m_buffer.clear();
 		std::copy(buffer.cbegin(), buffer.cend(), std::back_inserter(m_buffer));
 		m_valid = true;
@@ -46,7 +54,7 @@ namespace libpepp {
 			size_t size
 		)
 	{
-		spdlog::debug("Copied to base object with size: {}.", size);
+		spdlog::trace("Copied to base object with size: {}.", size);
 		m_buffer.clear();
 		auto buffer = reinterpret_cast<const uint8_t*>(pointer);
 		std::copy(buffer, buffer + size, std::back_inserter(m_buffer));

@@ -5,7 +5,7 @@ namespace libpepp {
 		size_t offset
 	)
 	{
-		spdlog::debug("Section header constructed with offset: {}.", offset);
+		spdlog::trace("Section header constructed with offset: {}.", offset);
 		open(offset);
 	}
 
@@ -14,7 +14,7 @@ namespace libpepp {
 			size_t offset
 		)
 	{
-		spdlog::debug("Building section header with base object and offset: {}.", offset);
+		spdlog::trace("Building section header with base object and offset: {}.", offset);
 		open(m_buffer, offset);
 	}
 
@@ -24,7 +24,7 @@ namespace libpepp {
 			size_t offset
 		)
 	{
-		spdlog::debug("Building section header with given buffer and offset: {}.", offset);
+		spdlog::trace("Building section header with given buffer and offset: {}.", offset);
 		const auto pSectionHeader = reinterpret_cast<IMAGE_SECTION_HEADER const*>(buffer.data() + offset);
 
 		// Copy header to myself
@@ -53,6 +53,7 @@ namespace libpepp {
 			size_t offset
 		)
 	{
+		spdlog::trace("Copied section header to buffer with allocate");
 		auto pointer = reinterpret_cast<uint8_t*>(dynamic_cast<PIMAGE_SECTION_HEADER>(this));
 		buffer.resize(offset + sizeof(IMAGE_SECTION_HEADER));
 		std::copy(pointer, pointer + sizeof(IMAGE_SECTION_HEADER), buffer.begin() + offset);
@@ -74,6 +75,7 @@ namespace libpepp {
 			size_t offset
 		)
 	{
+		spdlog::trace("Copied section header to buffer without allocate");
 		auto pointer = reinterpret_cast<uint8_t*>(dynamic_cast<PIMAGE_SECTION_HEADER>(this));
 		std::copy(pointer, pointer + sizeof(IMAGE_SECTION_HEADER), buffer.begin() + offset);
 
@@ -104,6 +106,7 @@ namespace libpepp {
 			Buffer& content
 		)
 	{
+		spdlog::trace("Copied section content to buffer with allocate");
 		buffer.resize(offset + content.size());
 		std::copy(content.cbegin(), content.cend(), buffer.begin() + offset);
 
@@ -134,6 +137,7 @@ namespace libpepp {
 			Buffer& content
 		)
 	{
+		spdlog::trace("Copied section content to buffer without allocate");
 		std::copy(content.cbegin(), content.cend(), buffer.begin() + offset);
 
 		return offset + content.size();
@@ -144,7 +148,7 @@ namespace libpepp {
 			IMAGE_SECTION_HEADER const* pointer
 		)
 	{
-		spdlog::debug("Copied to section header.");
+		spdlog::trace("Copied to section header.");
 		auto pSectionHeader = dynamic_cast<PIMAGE_SECTION_HEADER>(this);
 		memcpy(pSectionHeader, pointer, sizeof(IMAGE_SECTION_HEADER));
 	}
@@ -155,7 +159,7 @@ namespace libpepp {
 			size_t size
 		)
 	{
-		spdlog::debug("Copied to section content with size: {}.", size);
+		spdlog::trace("Copied to section content with size: {}.", size);
 		m_content.clear();
 		m_content.resize(size);
 		auto buffer = reinterpret_cast<const uint8_t*>(pointer);

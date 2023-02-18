@@ -5,7 +5,7 @@ namespace libpepp {
 		size_t offset
 	)
 	{
-		spdlog::debug("File header constructed with offset: {}.", offset);
+		spdlog::trace("File header constructed with offset: {}.", offset);
 		open(offset);
 	}
 
@@ -14,7 +14,7 @@ namespace libpepp {
 			size_t offset
 		)
 	{
-		spdlog::debug("Building file header with base object and offset: {}.", offset);
+		spdlog::trace("Building file header with base object and offset: {}.", offset);
 		open(m_buffer, offset);
 	}
 
@@ -29,7 +29,7 @@ namespace libpepp {
 			return;
 		}
 
-		spdlog::debug("Building file header with given buffer and offset: {}.", offset);
+		spdlog::trace("Building file header with given buffer and offset: {}.", offset);
 		const auto pFileHeader = reinterpret_cast<IMAGE_FILE_HEADER const*>(buffer.data() + offset);
 
 		// Copy to myself
@@ -51,6 +51,7 @@ namespace libpepp {
 			size_t offset
 		)
 	{
+		spdlog::trace("Copied file header to buffer with allocate");
 		auto pointer = reinterpret_cast<uint8_t*>(dynamic_cast<PIMAGE_FILE_HEADER>(this));
 		buffer.resize(offset + sizeof(IMAGE_FILE_HEADER));
 		std::copy(pointer, pointer + sizeof(IMAGE_FILE_HEADER), buffer.begin() + offset);
@@ -70,6 +71,7 @@ namespace libpepp {
 			size_t offset
 		)
 	{
+		spdlog::trace("Copied file header to buffer without allocate");
 		auto pointer = reinterpret_cast<uint8_t*>(dynamic_cast<PIMAGE_FILE_HEADER>(this));
 		std::copy(pointer, pointer + sizeof(IMAGE_FILE_HEADER), buffer.begin() + offset);
 	}
@@ -79,7 +81,7 @@ namespace libpepp {
 			IMAGE_FILE_HEADER const* pointer
 		)
 	{
-		spdlog::debug("Copied to file header.");
+		spdlog::trace("Copied to file header.");
 		auto pFileHeader = dynamic_cast<PIMAGE_FILE_HEADER>(this);
 		memcpy(pFileHeader, pointer, sizeof(IMAGE_FILE_HEADER));
 	}

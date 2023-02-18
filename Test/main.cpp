@@ -9,7 +9,7 @@ main(
 	void
 )
 {
-	spdlog::set_level(spdlog::level::debug);
+	spdlog::set_level(spdlog::level::trace);
 
 	std::string pathTarget = R"(C:\Windows\system32\kernel32.dll)";
 	libpepp::Pe objTarget(pathTarget);

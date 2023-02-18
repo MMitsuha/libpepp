@@ -3,7 +3,7 @@
 namespace libpepp {
 	DosHeader::DosHeader()
 	{
-		spdlog::debug("Dos header constructed.");
+		spdlog::trace("Dos header constructed.");
 		open();
 	}
 
@@ -12,7 +12,7 @@ namespace libpepp {
 			void
 		)
 	{
-		spdlog::debug("Building dos header with base object.");
+		spdlog::trace("Building dos header with base object.");
 		open(m_buffer);
 	}
 
@@ -26,7 +26,7 @@ namespace libpepp {
 			return;
 		}
 
-		spdlog::debug("Building dos header with given buffer.");
+		spdlog::trace("Building dos header with given buffer.");
 		const auto pDosHeader = reinterpret_cast<IMAGE_DOS_HEADER const*>(buffer.data());
 		const auto pointer = reinterpret_cast<IMAGE_DOS_HEADER const*>(buffer.data());
 
@@ -64,6 +64,7 @@ namespace libpepp {
 			Buffer& buffer
 		)
 	{
+		spdlog::trace("Copied dos header to buffer with allocate");
 		auto pointer = reinterpret_cast<uint8_t*>(dynamic_cast<PIMAGE_DOS_HEADER>(this));
 		buffer.resize(sizeof(IMAGE_DOS_HEADER) + m_DosStub.size());
 		std::copy(pointer, pointer + sizeof(IMAGE_DOS_HEADER), buffer.begin());
@@ -84,6 +85,7 @@ namespace libpepp {
 			Buffer& buffer
 		)
 	{
+		spdlog::trace("Copied dos header to buffer without allocate");
 		auto pointer = reinterpret_cast<uint8_t*>(dynamic_cast<PIMAGE_DOS_HEADER>(this));
 		std::copy(pointer, pointer + sizeof(IMAGE_DOS_HEADER), buffer.begin());
 		std::copy(m_DosStub.cbegin(), m_DosStub.cend(), buffer.begin() + sizeof(IMAGE_DOS_HEADER));
@@ -103,7 +105,7 @@ namespace libpepp {
 			IMAGE_DOS_HEADER const* pointer
 		)
 	{
-		spdlog::debug("Copied to dos header");
+		spdlog::trace("Copied to dos header");
 		auto pDosHeader = dynamic_cast<PIMAGE_DOS_HEADER>(this);
 		memcpy(pDosHeader, pointer, sizeof(IMAGE_DOS_HEADER));
 	}

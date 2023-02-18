@@ -17,6 +17,11 @@ namespace libpepp {
 				const std::filesystem::path& path
 			);
 
+		explicit
+			BaseObject(
+				const Buffer& buffer
+			);
+
 		bool
 			open(
 				const std::filesystem::path& path

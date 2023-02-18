@@ -6,7 +6,7 @@ namespace libpepp {
 		size_t size
 	)
 	{
-		spdlog::debug("Optional header constructed with offset: {} and size: {}.", offset, size);
+		spdlog::trace("Optional header constructed with offset: {} and size: {}.", offset, size);
 		open(offset, size);
 	}
 
@@ -16,7 +16,7 @@ namespace libpepp {
 			size_t size
 		)
 	{
-		spdlog::debug("Building optional header with base object and offset: {} and size: {}.", offset, size);
+		spdlog::trace("Building optional header with base object and offset: {} and size: {}.", offset, size);
 		open(m_buffer, offset, size);
 	}
 
@@ -32,7 +32,7 @@ namespace libpepp {
 			return;
 		}
 
-		spdlog::debug("Building optional header with given buffer and offset: {} and size: {}.", offset, size);
+		spdlog::trace("Building optional header with given buffer and offset: {} and size: {}.", offset, size);
 		const auto pOptionalHeader = reinterpret_cast<IMAGE_OPTIONAL_HEADER const*>(buffer.data() + offset);
 
 		// Copy to myself
@@ -56,6 +56,7 @@ namespace libpepp {
 			size_t size
 		)
 	{
+		spdlog::trace("Copied optional header to buffer with allocate");
 		auto pointer = reinterpret_cast<uint8_t*>(dynamic_cast<PIMAGE_OPTIONAL_HEADER>(this));
 		buffer.resize(offset + size);
 		std::copy(pointer, pointer + size, buffer.begin() + offset);
@@ -77,6 +78,7 @@ namespace libpepp {
 			size_t size
 		)
 	{
+		spdlog::trace("Copied optional header to buffer without allocate");
 		auto pointer = reinterpret_cast<uint8_t*>(dynamic_cast<PIMAGE_OPTIONAL_HEADER>(this));
 		std::copy(pointer, pointer + size, buffer.begin() + offset);
 	}
@@ -87,7 +89,7 @@ namespace libpepp {
 			size_t size
 		)
 	{
-		spdlog::debug("Copied to optional header with size: {}.", size);
+		spdlog::trace("Copied to optional header with size: {}.", size);
 		auto pOptionalHeader = dynamic_cast<PIMAGE_OPTIONAL_HEADER>(this);
 		memset(pOptionalHeader, 0, sizeof(IMAGE_OPTIONAL_HEADER));
 		memcpy(pOptionalHeader, pointer, size);
